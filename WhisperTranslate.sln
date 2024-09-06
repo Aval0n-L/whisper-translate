@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{87F2DF71-4F19-42CE-962C-69394B9ED5A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhisperTranslate", "src\WhisperTranslate\WhisperTranslate.csproj", "{F91D7EB2-06E9-43A2-A5CF-A63A9F5E47FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DE3A4EAB-BD18-47E2-ABF8-D781BE0B4413}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WhisperTranslate.Tests", "test\WhisperTranslate.Tests\WhisperTranslate.Tests.csproj", "{CF61DF2E-11FD-44A3-B76B-E33AA90B7D60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{40A672C3-3575-4646-8181-EAA10E87E075}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Dockerfile = Dockerfile
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "whisper-translate.client", "whisper-translate.client\whisper-translate.client.esproj", "{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F91D7EB2-06E9-43A2-A5CF-A63A9F5E47FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F91D7EB2-06E9-43A2-A5CF-A63A9F5E47FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F91D7EB2-06E9-43A2-A5CF-A63A9F5E47FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F91D7EB2-06E9-43A2-A5CF-A63A9F5E47FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF61DF2E-11FD-44A3-B76B-E33AA90B7D60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF61DF2E-11FD-44A3-B76B-E33AA90B7D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF61DF2E-11FD-44A3-B76B-E33AA90B7D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF61DF2E-11FD-44A3-B76B-E33AA90B7D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DC881E9-8D2B-4C38-B7F4-D715D306BF3C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F91D7EB2-06E9-43A2-A5CF-A63A9F5E47FB} = {87F2DF71-4F19-42CE-962C-69394B9ED5A2}
+		{CF61DF2E-11FD-44A3-B76B-E33AA90B7D60} = {DE3A4EAB-BD18-47E2-ABF8-D781BE0B4413}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {79A33D4C-A8E9-489A-8DD7-D29E4F13B523}
+	EndGlobalSection
+EndGlobal

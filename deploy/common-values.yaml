@@ -1,0 +1,17 @@
+name: whisper-translate
+
+settings: {
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
+    },
+    "Console": {
+      "Enabled": false
+    },
+    "Stdout": {
+      "Enabled": true
+    }
+  }
+}

@@ -2,13 +2,15 @@
 
 namespace WhisperTranslate;
 
-public class Startup(IConfiguration configuration)
+public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddCors(); 
+        services.AddCors();
 
         services.AddHealthChecks();
+
+        services.AddHttpClient();
 
         services
             .AddControllers()
@@ -21,7 +23,14 @@ public class Startup(IConfiguration configuration)
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         //configure CORS if you have public endpoints;
-        app.UseCors(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().SetPreflightMaxAge(TimeSpan.FromDays(1)));
+        app.UseCors(p => p.
+            AllowAnyOrigin().
+            AllowAnyHeader().
+            AllowAnyMethod().
+            WithExposedHeaders("Content-Disposition").
+            SetPreflightMaxAge(TimeSpan.FromDays(1)
+            )
+        );
 
         app.UseRouting();
 

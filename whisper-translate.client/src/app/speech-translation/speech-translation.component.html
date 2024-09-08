@@ -1,0 +1,29 @@
+<div class="container">
+  <div class="controls">
+    <button (click)="startRecording()">Начать запись</button>
+    <button (click)="stopRecording()">Остановить запись</button>
+  </div>
+
+  <div class="results">
+    <div class="recognized-text">
+      <h3>Распознанная речь:</h3>
+      <ul>
+        <li *ngFor="let text of recognizedText" class="list-item">{{ text }}</li>
+      </ul>
+    </div>
+
+    <div class="translated-text">
+      <h3>Перевод:</h3>
+      <ul>
+        <li *ngFor="let translate of translatedText" class="list-item">{{ translate }}</li>
+      </ul>
+    </div>
+
+    <div class="response-options">
+      <h3>Варианты ответа:</h3>
+      <ul>
+        <li *ngFor="let option of responseOptions" class="list-item">{{ option }}</li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -337,3 +337,4 @@ ASALocalRun/
 # User specific 
 **/*.user
 **/*-overrides.json
+*.openai

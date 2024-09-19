@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { WebSocketService } from './websocket.service';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -10,85 +12,80 @@ export class AudioCaptureService {
   private audioChunks: Blob[] = [];
   private isRecording: boolean = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private webSocketService: WebSocketService
+  ) {}
 
-  // Запуск записи
-  async startRecording(): Promise<void> {
-    if (this.isRecording) {
-      console.error('Запись уже идет.');
-      return;
-    }
-
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-    this.mediaRecorder = new MediaRecorder(stream, {
-      mimeType: 'audio/webm;codecs=opus',
-    });
-
-    // Логируем состояние записи
-    console.log('Начало записи аудио');
-    this.isRecording = true;
-
-    // Сохраняем аудиофрагменты по мере их доступности
-    this.mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        console.log('Добавлено в audioChunks, размер фрагмента:', event.data.size);
-        this.audioChunks.push(event.data);
+  async startRecording(
+    transferMethod: 'http' | 'websocket',
+    httpCallback?: (response: any) => void): Promise<void> {
+      if (this.isRecording) {
+        console.error('Recording is already in progress.');
+        return;
       }
-    };
 
-    // Начинаем запись
-    this.mediaRecorder.start();
-  }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-  // Остановка записи и отправка данных на сервер
-  stopRecording(updateResultsCallback: (response: any) => void): void {
-    if (!this.isRecording || !this.mediaRecorder) {
-      console.error('Запись не идет.');
-      return;
-    }
-
-    this.mediaRecorder.onstop = () => {
-      console.log('Запись остановлена, отправка данных на сервер.');
-
-      // Отправляем накопленные аудиофрагменты
-      this.sendAudio().subscribe({
-        next: (response) => {
-          console.log('Ответ сервера: ', response);
-          updateResultsCallback(response);  // Обновляем интерфейс с полученными данными
-        },
-        error: (error) => {
-          console.error('Ошибка при отправке аудио: ', error);
-        }
+      this.mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus',
       });
 
-      // Очищаем фрагменты после отправки
+      this.isRecording = true;
       this.audioChunks = [];
-      this.isRecording = false;
-    };
 
-    // Останавливаем запись
-    this.mediaRecorder.stop();
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+
+          if (transferMethod === 'websocket') {
+            const audioBlob = new Blob([event.data], { type: 'audio/webm' });
+            this.webSocketService.sendAudio(audioBlob);
+          }
+        }
+      };
+
+      this.mediaRecorder.onstop = () => {
+        if (transferMethod === 'http' && httpCallback) {
+          this.sendAudio().subscribe({
+            next: (response) => {
+              httpCallback(response);
+            },
+            error: (error) => {
+              console.error('Error sending audio: ', error);
+            },
+          });
+        }
+        this.isRecording = false;
+      };
+
+      // Split audio into chunks every 10 seconds
+      this.mediaRecorder.start(10000); 
   }
 
-  // Отправка аудиофрагментов на сервер и получение данных
+  stopRecording(transferMethod: 'http' | 'websocket'): void {
+    if (this.mediaRecorder && this.isRecording) {
+      this.mediaRecorder.stop();
+    }
+  }
+
   sendAudio(): Observable<any> {
-    // Проверяем, есть ли данные в audioChunks перед отправкой
     if (this.audioChunks.length === 0) {
-      console.error('Нет данных для отправки.');
+      console.error('There is no data to send.');
       return new Observable((observer) => {
-        observer.error('Нет данных для отправки.');
+        observer.error('There is no data to send.');
         observer.complete();
       });
     }
 
-    const audioBlob = new Blob(this.audioChunks, { type: 'audio/m4a' });
+    const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'audio.m4a');
+    formData.append('audio', audioBlob, 'audio.webm');
 
     const postRequest = this.http.post('https://localhost:5000/api/audio/upload', formData);
 
-    console.log('Аудиофрагмент отправляется.');
+    // Cleaning up audio fragments after sending
+    this.audioChunks = []; 
 
     return postRequest;
   }

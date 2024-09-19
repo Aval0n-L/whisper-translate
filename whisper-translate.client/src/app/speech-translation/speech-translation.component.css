@@ -28,16 +28,14 @@ h3 {
   margin-top: 0;
 }
 
-/* Добавляем отступы между элементами списка */
 .list-item {
-  margin-bottom: 10px; /* Отступы между элементами */
+  margin-bottom: 10px;
 }
 
-/* Можно добавить границу или тень */
 .list-item {
   margin-bottom: 15px;
   padding: 10px;
-  border: 1px solid #ccc; /* Граница вокруг каждого элемента */
-  border-radius: 5px; /* Закругленные углы */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Легкая тень для каждого элемента */
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }

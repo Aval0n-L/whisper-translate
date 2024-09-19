@@ -1,51 +1,83 @@
 import { Component, NgZone, OnInit } from '@angular/core';
 import { AudioCaptureService } from '../services/audio-capture.service';
-import { NgFor } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
+import { WebSocketService } from '../services/websocket.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-speech-translation',
   standalone: true,
-  imports: [NgFor],
+  imports: [NgFor, NgIf, FormsModule],
   templateUrl: './speech-translation.component.html',
   styleUrl: './speech-translation.component.css'
 })
 export class SpeechTranslationComponent implements OnInit {
-  recognizedText: string[] = []; // Текст, распознанный сервером
-  translatedText: string[] = []; // Переведенный текст
-  responseOptions: string[] = []; // Варианты ответа
+  recognizedText: string[] = [];
+  translatedText: string[] = [];
+  responseOptions: string[] = [];
+  recording = false;
+  
+  transferMethod: 'http' | 'websocket' = 'http'; // Default HTTP
 
-
-  constructor(private audioService: AudioCaptureService, private ngZone: NgZone) {}
+  constructor(
+    private audioService: AudioCaptureService, 
+    private webSocketService: WebSocketService,
+    private ngZone: NgZone) {}
 
   ngOnInit(): void {
-    this.loadSessionData(); // Загружаем данные из sessionStorage при загрузке страницы
+    this.loadSessionData();
   }
 
-  // Запуск записи и периодическая отправка аудио
   startRecording(): void {
-    this.audioService.startRecording();    
-    console.log('Запись начата');
-  }
-
-  // Остановка записи
-  stopRecording(): void {
-    this.audioService.stopRecording((response: any) => {
-      this.ngZone.run(() => { // Используем NgZone для обеспечения автоматического обновления UI
-        this.updateResults(response); // Обновляем результаты после получения ответа от сервера
-        this.saveSessionData(); // Сохраняем данные в sessionStorage после обновления
-      });
+    this.recording = true;
+    this.audioService.startRecording(this.transferMethod, (response: any) => {
+      // Updating results for HTTP method
+      if (this.transferMethod === 'http') {
+        this.ngZone.run(() => {
+          this.updateResults(response);
+          this.saveSessionData();
+        });
+      }
     });
-    console.log('Запись остановлена');
+
+    if (this.transferMethod === 'websocket') {
+      this.webSocketService.connect();
+
+      this.webSocketService.onMessage().subscribe((data: any) => {
+        // Updating results for WebSocket method
+        this.ngZone.run(() => {
+          this.updateResults(data);
+          this.saveSessionData();
+        });
+      });
+    }
+
+    console.log('Start recording');
   }
 
-  // Получение результатов с сервера (вызывается в sendAudio в audio-capture.service)
+  stopRecording(): void {
+    this.recording = false;
+    this.audioService.stopRecording(this.transferMethod);
+    if (this.transferMethod === 'websocket') {
+      this.webSocketService.disconnect();
+    }
+    console.log('Stop recording');
+  }
+
+  // Update result from the server side
   updateResults(response: any): void {
-    this.recognizedText.unshift(response.RecognizedText);
-    this.translatedText.unshift(response.TranslatedText);
-    this.responseOptions.unshift(...response.ResponseOptions);
+    this.recognizedText.unshift(response.recognizedText);
+    this.translatedText.unshift(response.translatedText);
+    this.responseOptions.unshift(...response.responseOptions);
   }
 
-  // Сохранение данных в sessionStorage
+  clearResults(): void {
+    this.recognizedText = [];
+    this.translatedText = [];
+    this.responseOptions = [];
+  }
+
+  // Save data in sessionStorage
   saveSessionData(): void {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       sessionStorage.setItem('recognizedText', JSON.stringify(this.recognizedText));
@@ -54,7 +86,7 @@ export class SpeechTranslationComponent implements OnInit {
     }
   }
 
-  // Загрузка данных из sessionStorage
+  // Load data from sessionStorage
   loadSessionData(): void {
     if (typeof window !== 'undefined' && window.sessionStorage) {
       const savedRecognizedText = sessionStorage.getItem('recognizedText');
